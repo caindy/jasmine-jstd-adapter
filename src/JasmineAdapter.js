@@ -56,6 +56,7 @@ jasmine.Env.prototype.it = function(description, closure){
 		try {
 			currentSpec.queue.start();
 		} finally {
+		  currentSpec.finish(); // @caindy - clean up the spec, e.g. remove spies
 		  frame.runAfter.apply(currentSpec);
 		}
 	};
@@ -81,6 +82,9 @@ jasmine.NestedResults.prototype.addResult = function(result) {
 jasmine.Block.prototype.execute = function(onComplete) {
 	try {
 		this.func.apply(this.spec);
+	} catch (e) { //@caindy - fail the spec before rethrowing
+      this.spec.fail(e);
+      throw e;
 	} finally {
 		onComplete();
 	}
